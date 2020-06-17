@@ -1,33 +1,32 @@
+// all the related endpoints will be grouped in this file (reorganized the code)
 const express= require('express')
 const {uuid} = require('uuidv4')
-const {isWebUri} = require('valid-url')
-const logger = require('../src/logger')
-const {bookMarks} = require('./store')
+//const {isWebUri} = require('valid-url')
+const logger = require('../logger')
+//const xss= require('xss')
 
-
-
+const bookMarks = require('../store')
+//const BookmarksService= require('./bookmarks-service')
 const bookmarksRouter= express.Router()
 const bodyParser= express.json() //to specify which will need to use a JSON body parser
 
+/*
+const sanitizedBookmark = bookMark => ({
+    id: bookMark.id,
+    title: xss(bookMark.title),
+    url: bookMark.url,
+    description: xss(bookMark.description)
+})*/
 
 bookmarksRouter
 .route('/bookmarks')
 .get((req,res)=>res.json(bookMarks)) //middleware
 .post(bodyParser,(req,res)=>{
 //validation middleware -> header
-    const {id, title, url, description} = req.body// object destructuring
-    console.log(req.body)
-    if (!title) {
-        logger.error('Title is required')
-        return res.status(400).send('error')
-    }
-    if (!description) {
-        logger.error('Description is required')
-        return res.status(400).send('error')
-    if (!isWebUri(url)) {
-        logger.error('Url must be a valid url')
-        return res.status(400).send('error')
-    }
+    for (const field of ['title','url','description']) {
+        if(!req.body[field]) {
+            logger.error(`${field} is required`)
+            return res.status(400).send(`${field} is required`)}
     }
 //after all validation passed
     const  bookMark= {id:uuid(), title, url, description}
@@ -48,8 +47,7 @@ bookmarksRouter
     //validation middleware
     if(!bookMark) {
         logger.error(`Bookmark with id ${id} not found`);
-        return res.status(404).send('Bookmark not found')
-    }
+        return res.status(404).send('Bookmark not found')}
     //return response
     res.json(bookMark)
 }) 

@@ -1,6 +1,6 @@
 INSERT INTO bookmarks (title,url,description)
 VALUES 
-('W3 SCHOOL', 'https://www.w3schools.com/', `THE WORLD'S LARGEST WEB DEVELOPER SITE`),
+('W3 SCHOOL', 'https://www.w3schools.com/', 'THE WORLDS LARGEST WEB DEVELOPER SITE'),
 ('THINKFUL', 'https://www.thinkful.com/' , 'Coding Bootcamp'),
 ('MDN WEB DOCS', 'https://developer.mozilla.org/en-US/', 'Resources for Developers, by Developers'),
 ('THE MODERN JS TUTORIAL', 'https://javascript.info/', 'from the basics to advanced topics with simple but detail explainations'),

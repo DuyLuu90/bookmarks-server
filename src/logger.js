@@ -1,10 +1,13 @@
 const winston= require('winston')
 const { NODE_ENV} = require('./config')
 
-//info.log
-//logger methods (gg npm winston)
-//Winston is a popular and robust logging lib used to log all failures
-//Winston's six level of severity: silly, debug, verbose,info, warn and error
+/*WINSTON
+    a popular and robust logging lib used to log all failures
+    levels of severity: (1)silly (2)debug (3)verbose,info (5)warn (6) error
+    INFO.LOG: where the log will be stored
+    methods: 
+*/ 
+
 const logger= winston.createLogger({
     level: 'info',
     format: winston.format.json(),

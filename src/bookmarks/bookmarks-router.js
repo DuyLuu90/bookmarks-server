@@ -1,34 +1,39 @@
 // all the related endpoints will be grouped in this file (reorganized the code)
 const express= require('express')
 const {uuid} = require('uuidv4')
-//const {isWebUri} = require('valid-url')
 const logger = require('../logger')
-//const xss= require('xss')
+//const {isWebUri} = require('valid-url')
+const xss= require('xss')
 
 const bookMarks = require('../store')
+const BookmarksService = require('./bookmarks-service')
 //const BookmarksService= require('./bookmarks-service')
 const bookmarksRouter= express.Router()
 const bodyParser= express.json() //to specify which will need to use a JSON body parser
 
-/*
+
 const sanitizedBookmark = bookMark => ({
     id: bookMark.id,
     title: xss(bookMark.title),
     url: bookMark.url,
     description: xss(bookMark.description)
-})*/
+})
 
 bookmarksRouter
 .route('/bookmarks')
-.get((req,res)=>res.json(bookMarks)) //middleware
+.get((req,res,next)=>{
+    BookmarksService.getAllBookmarks(req.app.get('db'))
+        .then(bookMarks=>res.status(200).json(bookMarks.map(sanitizedBookmark)))
+        .catch(next)
+}) 
 .post(bodyParser,(req,res)=>{
-//validation middleware -> header
+    //validation middleware -> header
     for (const field of ['title','url','description']) {
         if(!req.body[field]) {
             logger.error(`${field} is required`)
             return res.status(400).send(`${field} is required`)}
     }
-//after all validation passed
+    //after all validation passed
     const  bookMark= {id:uuid(), title, url, description}
     bookMarks.push(bookMark)
     logger.info(`Bookmark with id ${bookMark.id} created`)
@@ -47,7 +52,7 @@ bookmarksRouter
     //validation middleware
     if(!bookMark) {
         logger.error(`Bookmark with id ${id} not found`);
-        return res.status(404).send('Bookmark not found')}
+        return res.status(404).json({error:{message:`Bookmark not found`}})}
     //return response
     res.json(bookMark)
 }) 
@@ -63,6 +68,6 @@ bookmarksRouter
     bookMarks.splice(index,1);
     logger.info(`Bookmark with id ${id} deleted`)
     res.status(204).end()
-}) //middleware
+}) 
 
 module.exports = bookmarksRouter

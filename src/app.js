@@ -25,8 +25,7 @@ app.use(morgan(morganSetting))
 app.use(cors())
 app.use(helmet())
 
-
-//Authorization
+//AUTHORIZATION
 app.use((req, res, next)=>{
     const userAuth= req.get('Authorization')
     if(!userAuth || userAuth.split(' ')[1] !== API_TOKEN) {
@@ -35,19 +34,8 @@ app.use((req, res, next)=>{
     next();
 })
 
+//HTTP REQUESTS (method+headers+body)
 app.use(bookmarksRouter)
-
-//Error handling
-app.use((error, req,res, next)=>{
-    let response;
-    if (NODE_ENV === 'production') {
-        response= {error: {message: 'server error'}}
-    }
-    else response={message: error.message, error}
-    res.status(500).json(response)
-})
-
-//BUILD AN API with HTTP requests (method+headers+body)
 
 app.get('/', (req,res)=>{
     const responseText = {
@@ -58,22 +46,20 @@ app.get('/', (req,res)=>{
         "Content": bookmarks}
     res.json(responseText) // to respond to the client with no content, use end()
 })
-
-app.get('/', (req,res)=>{
-    res.send("A GET Request")
-})
-app.post('/', (req,res)=>{
-    const {title, url, description}= req.body;
-    res.send('POST request received')
-})
-app.delete('/:id',(req,res)=>{
-    const {id}= req.params;
-    res.send('DELETE request received')
-})
-//XSS example:
+/*
 app.get('/xss', (req, res) => {
     res.cookie('secretToken', '1234567890');
     res.sendFile(__dirname + '/drills/xss-example.html');
-});
+});*/
+
+//ERROR HANDLING
+app.use((error, req,res, next)=>{
+    let response;
+    if (NODE_ENV === 'production') {
+        response= {error: {message: 'server error'}}
+    }
+    else response={message: error.message, error}
+    res.status(500).json(response)
+})
 
 module.exports = app 

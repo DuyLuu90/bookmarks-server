@@ -1,6 +1,6 @@
 // all the related endpoints will be grouped in this file (reorganized the code)
 const express= require('express')
-const {uuid} = require('uuidv4')
+//const {uuid} = require('uuidv4')
 const logger = require('../logger')
 //const {isWebUri} = require('valid-url')
 const xss= require('xss')
@@ -26,7 +26,7 @@ bookmarksRouter
         .then(bookMarks=>res.status(200).json(bookMarks.map(sanitizedBookmark)))
         .catch(next)
 }) 
-.post(bodyParser,(req,res)=>{
+.post(bodyParser,(req,res,next)=>{
     //validation middleware -> header
     for (const field of ['title','url','description']) {
         if(!req.body[field]) {
@@ -34,13 +34,19 @@ bookmarksRouter
             return res.status(400).send(`${field} is required`)}
     }
     //after all validation passed
-    const  bookMark= {id:uuid(), title, url, description}
-    bookMarks.push(bookMark)
-    logger.info(`Bookmark with id ${bookMark.id} created`)
-    res
-    .status(201)
-    .location(`http://localhost:8000/bookmarks/${bookMark.id}`)
-    .json(bookMark)
+    const {title,url,description} = req.body
+    const  newBookMark= {title, url, description}
+    bookMarks.push(newBookMark)
+    logger.info(`Bookmark with id ${newBookMark.id} created`)
+    BookmarksService.insertBookmark(req.app.get('db'),newBookMark)
+    .then(()=>{
+        res
+        .status(201)
+        .location(`http://localhost:8000/bookmarks/${newBookMark.id}`)
+        .json(newBookMark)
+    })
+    .catch(next)
+    
 }) 
 
 

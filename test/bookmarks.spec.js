@@ -3,6 +3,7 @@ const bookmarkService = require('../src/bookmarks/bookmarks-service')
 const fixtures = require('./bookmarks-fixtures')
 const app = require('../src/app')
 const supertest = require('supertest')
+const { expect } = require('chai')
 
 describe('Article service obj', ()=> {
     let db;
@@ -21,7 +22,7 @@ describe('Article service obj', ()=> {
     afterEach ('cleanup', ()=>db('bookmarks').truncate())
     after ('disconnect from db', ()=> db.destroy())// go of db connection 
     
-    describe('Unauthorized request', ()=>{
+    describe.skip('Unauthorized request', ()=>{
         const testBookmarks= fixtures.makeBookmarksArray()
         beforeEach('insert bookmarks',()=>{
             return db.into('bookmarks').insert(testBookmarks) 
@@ -45,7 +46,7 @@ describe('Article service obj', ()=> {
         }) 
     }) 
 
-    describe('GET /bookmarks', ()=> {
+    describe.skip('GET /bookmarks', ()=> {
         context('Given no bookmarks', ()=>{
             it(`respond with 200 and an empty list`, ()=>{
                 return supertest(app).get('/bookmarks')
@@ -66,7 +67,7 @@ describe('Article service obj', ()=> {
         })
     })
 
-    describe('GET /bookmarks/:id', ()=> {
+    describe.skip('GET /bookmarks/:id', ()=> {
         context('Given no bookmark', ()=>{
             it(`Respond 404 bookmark doesn't exist`,()=>{
                 return supertest(app).get('/bookmarks/123')
@@ -81,10 +82,10 @@ describe('Article service obj', ()=> {
             })
             it(`Respond with 200 and the specified bookmark`,()=>{
                 const bookmarkId=2
-                const expectedBookmark= testBookmarks[bookmarkId-1]
+                const expectdBookmark= testBookmarks[bookmarkId-1]
                 return supertest(app).get(`/bookmarks/${bookmarkId}`)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-                .expect(200,expectedBookmark)
+                .expect(200,expectdBookmark)
             })    
         })
     })
@@ -95,44 +96,55 @@ describe('Article service obj', ()=> {
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(404,`Bookmark not found`)
         })
-        it.skip('remove the bookmark by ID from the store', ()=>{
+        it('remove the bookmark by ID from the store', ()=>{
             const bookmarkId=2
-            const expectedBookmark= testBookmarks.filter(b=>b.id!==idToDelete)
+            const expectdBookmark= testBookmarks.filter(b=>b.id!==bookmarkId)
             return supertest(app).delete(`/bookmarks/${bookmarkId}`)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(204)
                 .then(()=>{
-
+                    supertest(app).get(`/bookmarks`)
+                    .expect(expectdBookmark)
                 })
         })
     })
 
-    describe.skip('POST /bookmarks', ()=> {
-        /*
+    describe.only('POST /bookmarks', ()=> {
+        
         const requiredFields = ['title','url','description']
         requiredFields.forEach(field=>{
-            const newItem= {title,url,description}
+            const newItem= {
+                title: 'new title',
+                url: `http://test.com`,
+                description:`new description`}
             it(`responds with 400 and an error message when '${field}' is missing`, ()=>{
                 delete newItem[field]
                 return supertest(app).post(`/bookmarks`)
-                .expect(400,`${fiels} is missing`)
+                .send(newItem)
+                .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                .expect(400,`${field} is required`)
             })
-        })*/
+        })
         
-        it('add a new bookmark to the store', ()=> {
+        it.skip('add a new bookmark to the store', ()=> {
             const newBookmark= {
                 title: 'test title',
                 url: `http://test.com`, 
                 description: `test description`,
             }
-            return supertest(app).post(`/bookmarks/${bookmarkId}`)
+            return supertest(app).post(`/bookmarks`)
+                .send(newBookmark)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(201)
                 .expect(res=>{
-
+                    expect(res.body.title).to.eql(newBookmark.title)
+                    expect(res.body.url).to.eql(newBookmark.url)
+                    expect(res.body.description).to.eql(newBookmark.description)
                 })
-                .then(res=>{
-
+                .then(postRes=>{
+                    supertest(app).get(`/bookmarks/${postRes.body.id}`)
+                    //.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                    .expect(postRes.body)
                 })
         })
         //XSS, known as cross-site scripting. We can prevent XSS attacks by "sanitizing" the content in our reponse data, by (1) ESCAPING any potential script elements (2) suspicious JS in response data 

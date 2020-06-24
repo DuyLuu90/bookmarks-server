@@ -1,6 +1,6 @@
 #REST: 
     1.Representation(<resources>) State(<conditions>) Transfer(<HTTP>)(set of constrains)  \  
-    2.Constrains: address, methods, query strings, response body \
+    2.Constrains: <endpoint address>, <methods>, query strings, <response body> \
         Separation of concerns \
         statelessness: no client info gets stored \
         cacheability: req should be predictable \
@@ -8,10 +8,10 @@
         uniform UI
     3.Benefits/goals: simple, predictable,consistent,clear direction,patterns, allow flexibility in diff implementation,efficient and performant, scalable  \
     4.RES:
-        Resources: data (order) \
-        Database: store \
-        API server: clerk \
-        HTTP req/res: the phone conversation \
+        <Resources>: data (order) \
+        <Database>: store \
+        <API server>: clerk \
+        <HTTP req|res>: the phone conversation \
 #NOTES:
     1.Uniformed UI: 
         Patch(update) vs Put(replace) \

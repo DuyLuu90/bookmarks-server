@@ -1,55 +1,53 @@
 const knex= require('knex')
-const bookmarkService = require('../src/bookmarks/bookmarks-service')
 const fixtures = require('./bookmarks-fixtures')
 const app = require('../src/app')
-const supertest = require('supertest')
-const { expect } = require('chai')
 
-describe('Article service obj', ()=> {
+describe('Bookmark service obj', ()=> {
     let db;
-    //use this array to represent valid content of our db
-    const testBookmarks= fixtures.makeBookmarksArray()
-    //prepare the db connection 
+    const testBookmarks= fixtures.makeBookmarksArray() //use this array to represent valid content of our db
     before('make knex Instance', ()=> {
         db= knex({
             client: 'pg',
-            connection: process.env.TEST_DB_URL}) 
+            connection: process.env.DB_URL}) 
         app.set('db', db)
-        })
-    //NOTE:  ()=> {return db().select()} vs ()=> db().select()
+    })
     
-    before ('cleanup', ()=>db('bookmarks').truncate()) // remove all of the data from the table
-    afterEach ('cleanup', ()=>db('bookmarks').truncate())
-    after ('disconnect from db', ()=> db.destroy())// go of db connection 
+    before('cleanup', ()=>db('bookmarks').truncate()) // remove all of the data from the table
+    afterEach('cleanup', ()=>db('bookmarks').truncate())
+    after('disconnect from db', ()=> db.destroy())// go of db connection 
     
     describe.skip('Unauthorized request', ()=>{
-        const testBookmarks= fixtures.makeBookmarksArray()
         beforeEach('insert bookmarks',()=>{
             return db.into('bookmarks').insert(testBookmarks) 
         })
         //supertest(app): pass the express server obj and invoke the endpoint
-        it('GET /bookmarks 401 unauthorized respond', ()=>{
-            return supertest(app).get('/bookmarks')
+        it('GET /api/bookmarks 401 unauthorized respond', ()=>{
+            return supertest(app).get('/api/bookmarks')
                 .expect(401,{error:'Unauthorized request'})
         })
-        it('POST /bookmarks/ 401 unauthorized respond', ()=>{
-            return supertest(app).post('/bookmarks')
+        it('POST /api/bookmarks/ 401 unauthorized respond', ()=>{
+            return supertest(app).post('/api/bookmarks')
                 .expect(401,{error:'Unauthorized request'}) 
         })
-        it('GET /bookmarks/:id 401 unauthorized respond', ()=>{
-            return supertest(app).get('/bookmarks/1')
+        it('GET /api/bookmarks/:id 401 unauthorized respond', ()=>{
+            return supertest(app).get('/api/bookmarks/1')
                 .expect(401,{error:'Unauthorized request'})
         })
-        it('DELETE /bookmarks/:id 401 unauthorized respond', ()=>{
-            return supertest(app).delete('/bookmarks/1')
+        it('PATCH /api/bookmarks/:id 401 unauthorized respond', ()=>{
+            return supertest(app).patch('/api/bookmarks/1')
+                .send({title:`updated-title`})
+                .expect(401,{error:'Unauthorized request'})
+        })
+        it('DELETE /api/bookmarks/:id 401 unauthorized respond', ()=>{
+            return supertest(app).delete('/api/bookmarks/1')
                 .expect(401,{error:'Unauthorized request'})
         }) 
     }) 
 
-    describe.skip('GET /bookmarks', ()=> {
+    describe.skip('GET /api/bookmarks', ()=> {
         context('Given no bookmarks', ()=>{
             it(`respond with 200 and an empty list`, ()=>{
-                return supertest(app).get('/bookmarks')
+                return supertest(app).get('/api/bookmarks')
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(200,[])
             })
@@ -59,7 +57,7 @@ describe('Article service obj', ()=> {
                 return db.into('bookmarks').insert(testBookmarks)
             })
             it(`get the bookmarks from the store`,()=>{
-                return supertest(app).get('/bookmarks')
+                return supertest(app).get('/api/bookmarks')
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(200,testBookmarks)
             })
@@ -67,10 +65,10 @@ describe('Article service obj', ()=> {
         })
     })
 
-    describe.skip('GET /bookmarks/:id', ()=> {
+    describe.skip('GET /api/bookmarks/:id', ()=> {
         context('Given no bookmark', ()=>{
             it(`Respond 404 bookmark doesn't exist`,()=>{
-                return supertest(app).get('/bookmarks/123')
+                return supertest(app).get('/api/bookmarks/123')
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(404,{error:{message:`Bookmark not found`}})
             })
@@ -83,33 +81,33 @@ describe('Article service obj', ()=> {
             it(`Respond with 200 and the specified bookmark`,()=>{
                 const bookmarkId=2
                 const expectdBookmark= testBookmarks[bookmarkId-1]
-                return supertest(app).get(`/bookmarks/${bookmarkId}`)
+                return supertest(app).get(`/api/bookmarks/${bookmarkId}`)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(200,expectdBookmark)
             })    
         })
     })
 
-    describe.skip('DELETE /bookmarks/:id', ()=> {
+    describe.skip('DELETE /api/bookmarks/:id', ()=> {
         it('return 404 when bookmark does not exist', ()=>{
-            return supertest(app).delete(`/bookmarks/123456`)
+            return supertest(app).delete(`/api/bookmarks/123456`)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(404,`Bookmark not found`)
         })
         it('remove the bookmark by ID from the store', ()=>{
             const bookmarkId=2
             const expectdBookmark= testBookmarks.filter(b=>b.id!==bookmarkId)
-            return supertest(app).delete(`/bookmarks/${bookmarkId}`)
+            return supertest(app).delete(`/api/bookmarks/${bookmarkId}`)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(204)
                 .then(()=>{
-                    supertest(app).get(`/bookmarks`)
+                    supertest(app).get(`/api/bookmarks`)
                     .expect(expectdBookmark)
                 })
         })
     })
 
-    describe.only('POST /bookmarks', ()=> {
+    describe.skip('POST /api/bookmarks', ()=> {
         
         const requiredFields = ['title','url','description']
         requiredFields.forEach(field=>{
@@ -119,7 +117,7 @@ describe('Article service obj', ()=> {
                 description:`new description`}
             it(`responds with 400 and an error message when '${field}' is missing`, ()=>{
                 delete newItem[field]
-                return supertest(app).post(`/bookmarks`)
+                return supertest(app).post(`/api/bookmarks`)
                 .send(newItem)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(400,`${field} is required`)
@@ -132,7 +130,7 @@ describe('Article service obj', ()=> {
                 url: `http://test.com`, 
                 description: `test description`,
             }
-            return supertest(app).post(`/bookmarks`)
+            return supertest(app).post(`/api/bookmarks`)
                 .send(newBookmark)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(201)
@@ -142,7 +140,7 @@ describe('Article service obj', ()=> {
                     expect(res.body.description).to.eql(newBookmark.description)
                 })
                 .then(postRes=>{
-                    supertest(app).get(`/bookmarks/${postRes.body.id}`)
+                    supertest(app).get(`/api/bookmarks/${postRes.body.id}`)
                     //.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                     .expect(postRes.body)
                 })
@@ -158,5 +156,73 @@ describe('Article service obj', ()=> {
 
             })
         })*/
+    })
+    describe.only(`PATCH /api/bookmarks/:id`,()=>{
+        context('Given no bookmark',()=>{
+            it('respond with 404',()=>{
+                const bookmarkId=123456
+                return supertest(app)
+                    .patch(`/api/bookmarks/${bookmarkId}`)
+                    .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                    .expect(404,{error:{message:`Bookmark doesn't exist`}})
+            })
+        })
+        context.skip(`Given there are bookmark`,()=>{
+            it(`respond with 400 when no required field supplied`,()=>{
+                const bookmarkId=2
+                return supertest(app)
+                    .patch(`/api/bookmarks/${bookmarkId}`)
+                    .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                    .send({irrelevantField:`foo`})
+                    .expect(400,{
+                        error: {
+                            message: `Req body must contain either 'title','url',or'description'`
+                        }
+                    })
+            })
+            it('respond with 204 when updating only a subset',()=>{
+                const bookmarkId=2
+                const updatedBookmark = {
+                    title: 'update bookmark title'
+                }
+                const expectedBookmark = {
+                    ...testBookmarks[bookmarkId-1],
+                    ...updatedBookmark
+                }
+                return supertest(app)
+                    .patch(`/api/bookmarks/${bookmarkId}`)
+                    .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                    .send({
+                        ...updatedBookmark,
+                        fieldToIgnore: `should not be in GET response`
+                    })
+                    .expect(204)
+                    .then(res=>supertest(app)
+                        .get(`/api/bookmarks/${bookmarkId}`)
+                        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                        .expect(expectedBookmark))
+            })
+            it('respond with 204 and update the bookmark',()=>{
+                const bookmarkId=2
+                const updatedBookmark ={
+                    title: `new title`,
+                    url: `http://newwebsite.com`,
+                    description: 'new description'
+                }
+                const expectedBookmark= {
+                    ...testBookmarks[bookmarkId-1],
+                    ...updatedBookmark
+                }
+                return supertest(app)
+                    .patch(`/api/bookmarks/${bookmarkId}`)
+                    .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                    .send(updatedBookmark)
+                    .expect(204)
+                    .then(res=>supertest(app)
+                        .get(`/api/bookmarks/${bookmarkId}`)
+                        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+                        .expect(expectedBookmark))
+            })
+        })
     })
 })

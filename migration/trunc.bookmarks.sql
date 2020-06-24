@@ -1,1 +1,0 @@
-TRUNCATE bookmarks; /* clear all the data in the table */

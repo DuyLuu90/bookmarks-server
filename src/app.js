@@ -36,7 +36,7 @@ app.use((req, res, next)=>{
 
 //HTTP REQUESTS (method+headers+body)
 app.use(bookmarksRouter)
-
+/*
 app.get('/', (req,res)=>{
     const responseText = {
         "Base URL": req.baseUrl,
@@ -46,7 +46,7 @@ app.get('/', (req,res)=>{
         "Content": bookmarks}
     res.json(responseText) // to respond to the client with no content, use end()
 })
-/*
+
 app.get('/xss', (req, res) => {
     res.cookie('secretToken', '1234567890');
     res.sendFile(__dirname + '/drills/xss-example.html');

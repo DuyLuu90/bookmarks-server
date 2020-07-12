@@ -8,7 +8,7 @@ const xss= require('xss')
 const bookMarks = require('../store')
 const BookmarksService = require('./bookmarks-service')
 const bookmarksRouter= express.Router()
-const bodyParser= express.json() //to specify which will need to use a JSON body parser
+const bodyParser= express.json() //parse the body and give us the JSON obj to work with
 
 
 const sanitizedBookmark = bookMark => ({
@@ -32,7 +32,7 @@ bookmarksRouter
             return res.status(400).send(`${field} is required`)}
     }
     //after all validation passed
-    const {title,url,description} = req.body
+    const {title,url,description} = req.body //object destructuring 
     const  newBookMark= {title, url, description}
     bookMarks.push(newBookMark)
     logger.info(`Bookmark with id ${newBookMark.id} created`)
@@ -73,10 +73,9 @@ bookmarksRouter
     res.status(204).end()
 }) 
 .patch(bodyParser,(req,res,next)=>{
-    //const {title,url,description}=req.body
+    const {title,url,description}=req.body
     const bookMarkToUpdate= {title,url,description} 
     const knex=req.app.get('db')
-    
     BookmarksService.updateBookmark(knex,req.params.id,bookMarkToUpdate)
         .then((bookMark)=>{
             console.log(bookMark)

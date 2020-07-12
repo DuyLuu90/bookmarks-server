@@ -1,15 +1,15 @@
-#To create content for a file: 
+# To create content for a file: 
     echo <content> > <fileName>
     export <key> = <value>
     echo $<key> (print out the <value>)
 
-#Project boilerplate:
+# Project boilerplate:
     https://github.com/DuyLuu90/express-boilerplate 
     git clone <CLONE-URL> <name> && cd $_ && -rf .git && git init
     D dependencies: mocha, chai,suptertest,nodemon
     
 
-#To set up an app:
+# To set up an app:
     require('dotenv').config() <allow us to get access to variables inside the env file>
     const express= require('express')
     const morgan= require('morgan') <midleware, used for logging request details>
@@ -17,7 +17,7 @@
     const cors = require('cors') <to allow cross-origin-sharing-resources>
     const helmet= require('helmet') <a module in express, used to hide info from attackers>
 
-#MIDDLEWARES:
+# MIDDLEWARES:
     const morganSetting=process.env.NODE_ENV === 'production'? 'tiny': 'common'
     app.use(morgan(morganSetting)) <combined vs common vs dev vs short vs tiny>
     app.use(helmet()) <helmet should be used before cors>
@@ -25,14 +25,28 @@
     ->Authorization <only respond when given a valid Authorization header with a Bearer API token value>
     ->Error-handling <when a middleware has a list of 4 params, express knows to treat this as error handler. It is used to print a more user-friendly error in production.>
 
-#RESPONSE:
+# HTTP REQUESTS:
+    ## GET:
+    ## POST:
+        To set a default value if one is not provided, we can use the default value of the obj destructuring statement: {key1,key2,key3}=req.body
+        To send data to the server:
+            Query strinng param
+            Body of the request
+            Name route params (req.params)
+        Respond 400 if validation requirements do not pass
+        Respond 204 if No Content
+    ## PATCH:
+    ## DELETE:
+        findIndex() to find the index of the item, then use splice() to remove that item
+        No need to have an actual respond body
+# RESPONSE:
     .location(<URL>): access to the obj
 
-#ORGANIZE SERVER:
+# ORGANIZE SERVER:
     1. layering(vertical)
     2. modularizing (horizontal)
 
-#DEPLOYMENT STEPS:
+# DEPLOYMENT STEPS:
     ->hide secret
     ->respect env PORT
     ->use minimal logging
@@ -42,17 +56,17 @@
     ->make a Proclife: the file that Heroku look for to determine how to start the server Then in package.json, add "engines": {"node": "12.16.1"}
     ->audit our packages
 
-#HEROKU: 
-https://git.heroku.com/arcane-inlet-06429.git
-https://arcane-inlet-06429.herokuapp.com/ 
-heroku login-> git push heroku master -> heroku ps:scale web=1 -> heroku open
-    1. read the files->find the <package.json>->setup env variables
-    2. see Node version->install dependencies, ignore devDependencies
-    3. read the <Procfile>
+# HEROKU: 
+    https://git.heroku.com/arcane-inlet-06429.git
+    https://arcane-inlet-06429.herokuapp.com/ 
+    heroku login-> git push heroku master -> heroku ps:scale web=1 -> heroku open
+        1. read the files->find the <package.json>->setup env variables
+        2. see Node version->install dependencies, ignore devDependencies
+        3. read the <Procfile>
 #Setup env variables:
     heroku config:set <key>=<value>
 
-#BEST PRACTICES:
+#   BEST PRACTICES:
     Using CONTINUOUS INTEGRATION(CI) SERVICES
     Having multiple hosted env
     

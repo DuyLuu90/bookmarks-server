@@ -9,7 +9,8 @@ const logger= require('./logger')
 //IMPORT DATA
 const {NODE_ENV, API_TOKEN}= require('./config')
 const bookmarksRouter = require('./bookmarks/bookmarks-router')
-const bookmarks= require('./store')
+const simplebookmarksRouter= require('./simple-bookmarks/simple-boomarks-router')
+//const bookmarks= require('./store')
 
 /*OPTIONAL
 const {v4: uuid} require('uuid')
@@ -26,8 +27,10 @@ app.use(cors())
 app.use(helmet())
 
 //AUTHORIZATION
+
 app.use((req, res, next)=>{
     const userAuth= req.get('Authorization')
+    console.log(userAuth)
     if(!userAuth || userAuth.split(' ')[1] !== API_TOKEN) {
         logger.error(`Unauthorized request to path: ${req.path}`)
         return res.status(401).json({error: "Unauthorized request"})}
@@ -36,6 +39,7 @@ app.use((req, res, next)=>{
 
 //HTTP REQUESTS (method+headers+body)
 app.use(bookmarksRouter)
+app.use('/bookmarks',simplebookmarksRouter)
 /*
 app.get('/', (req,res)=>{
     const responseText = {

@@ -8,7 +8,7 @@ describe('Bookmark service obj', ()=> {
     before('make knex Instance', ()=> {
         db= knex({
             client: 'pg',
-            connection: process.env.DB_URL}) 
+            connection: process.env.TEST_DB_URL}) 
         app.set('db', db)
     })
     

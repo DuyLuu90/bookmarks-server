@@ -1,3 +1,8 @@
+# DATABASE:
+    ## Relational DB: 
+        store db in a very structured way
+        data and the relationship are represented as tables
+    ## NoSQL DB: less structured data, providing a dynamic approach
 #REST: 
     1.Representation(<resources>) State(<conditions>) Transfer(<HTTP>)(set of constrains)  \  
     2.Constrains: <endpoint address>, <methods>, query strings, <response body> \

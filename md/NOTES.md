@@ -26,8 +26,8 @@
     ->Error-handling <when a middleware has a list of 4 params, express knows to treat this as error handler. It is used to print a more user-friendly error in production.>
 
 # HTTP REQUESTS:
-    ## GET:
-    ## POST:
+    ## GET (Read/Select)
+    ## POST (Create/Insert):
         To set a default value if one is not provided, we can use the default value of the obj destructuring statement: {key1,key2,key3}=req.body
         To send data to the server:
             Query strinng param
@@ -35,7 +35,7 @@
             Name route params (req.params)
         Respond 400 if validation requirements do not pass
         Respond 204 if No Content
-    ## PATCH:
+    ## PATCH (Update):
     ## DELETE:
         findIndex() to find the index of the item, then use splice() to remove that item
         No need to have an actual respond body
@@ -46,6 +46,16 @@
     1. layering(vertical)
     2. modularizing (horizontal)
 
+# BUILDING SERVICES:
+    Purpose: 
+        To use for db trx. It's like a post office that has pre-defined methods to handle different trx
+    Methods: 
+        GET all, GET by id, INSERT, DELETE, update
+
+# MIGRATIONS:
+    Install Postgrator: npm i postgrator-cli@3.2.0 -D
+        Postgrator CLI reads the step number, and connects to our db by reading the dbURL value in postgrator-config.js
+    Steps: create tables
 # DEPLOYMENT STEPS:
     ->hide secret
     ->respect env PORT

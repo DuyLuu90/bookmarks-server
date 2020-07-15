@@ -14,3 +14,8 @@ app.set('db', db)
 app.listen(PORT, ()=> {
     console.log(`Server listening at http://localhost:${PORT}`)
 })
+/*
+process.on('unhandledRejection', (error, p) => {
+    console.log('=== UNHANDLED REJECTION ===');
+    console.dir(error.stack);
+});*/

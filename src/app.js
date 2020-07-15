@@ -4,12 +4,12 @@ const express= require('express')
 const morgan= require('morgan') // midleware, used for logging request details
 const cors = require('cors')
 const helmet= require('helmet')
-const logger= require('./logger')
+//const logger= require('./logger')
 
 //IMPORT DATA
 const {NODE_ENV, API_TOKEN}= require('./config')
 const bookmarksRouter = require('./bookmarks/bookmarks-router')
-const simplebookmarksRouter= require('./simple-bookmarks/simple-boomarks-router')
+//const simplebookmarksRouter= require('./simple-bookmarks/simple-boomarks-router')
 //const bookmarks= require('./store')
 
 /*OPTIONAL
@@ -21,8 +21,13 @@ const app= express()
 
 //MIDDLEWARES
 app.use(express.json())//parse the body and give us a properly formatted obj
-const morganSetting=(NODE_ENV === 'production'? 'tiny': 'common')
-app.use(morgan(morganSetting)) 
+
+/*
+app.use(morgan((NODE_ENV === 'production') 
+    ? 'tiny' 
+    : 'common', {skip: () => NODE_ENV === 'test',}
+))*/
+
 app.use(cors())
 app.use(helmet())
 
@@ -30,16 +35,16 @@ app.use(helmet())
 
 app.use((req, res, next)=>{
     const userAuth= req.get('Authorization')
-    console.log(userAuth)
     if(!userAuth || userAuth.split(' ')[1] !== API_TOKEN) {
-        logger.error(`Unauthorized request to path: ${req.path}`)
+        //logger.error(`Unauthorized request to path: ${req.path}`)
         return res.status(401).json({error: "Unauthorized request"})}
     next();
 })
 
 //HTTP REQUESTS (method+headers+body)
-app.use(bookmarksRouter)
-app.use('/bookmarks',simplebookmarksRouter)
+app.use('/api/bookmarks',bookmarksRouter)
+//app.use('/bookmarks',simplebookmarksRouter)
+
 /*
 app.get('/', (req,res)=>{
     const responseText = {

@@ -17,10 +17,11 @@ const logger= winston.createLogger({
 })
 
 //Conditional statement here
+
 if (NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
         format: winston.format.simple()
     }))
 }
- 
+
 module.exports= logger

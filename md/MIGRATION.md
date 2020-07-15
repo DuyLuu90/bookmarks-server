@@ -10,4 +10,13 @@
                 ? process.env.TEST_DB_URL
                 : process.env.DB_URL
         }
+TO CREATE DB:
+    CREATE DATABASE <dbName> OWNER <roleName> ;
+TO CREATE TABLE INTO A DATABASE
+    psql -U <user/roleName> -d <dbName> -f <filePath> ||
+    INSERT INTO <tableName> (columns) VALUES 
+        (row 1),
+        (row 2), ...
+        (row n) ; 
+
         

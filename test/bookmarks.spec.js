@@ -35,26 +35,26 @@ describe('BOOKMARK ENDPOINTS', ()=> {
         })
         //supertest(app): pass the express server obj and invoke the endpoint
     }) 
-    describe('GET /api/bookmarks', ()=> {
-        context('Given no bookmarks', ()=>{
+    describe(`GET /api/bookmarks`,()=>{
+        context('Given no bookmark',()=>{
             it(`respond with 200 and an empty list`, ()=>{
                 return supertest(app).get('/api/bookmarks')
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(200,[])
             })
         })
-        context('Given there are bookmarks', ()=>{
+        context(`Given there are bookmarks`,()=>{
             beforeEach('insert bookmarks',()=>{
                 return db.into('bookmarks').insert(testBookmarks)
             })
-            it(`respond with 200 and GET all bookmarks`,()=>{
+            it(`GET all bookmarks`,()=>{
                 return supertest(app).get('/api/bookmarks')
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                 .expect(200,testBookmarks)
             })
-            
         })
     })
+    
     describe('POST /api/bookmarks', ()=> {
         const requiredFields = ['title','url','description','rating']
         requiredFields.forEach(field=>{
@@ -109,8 +109,7 @@ describe('BOOKMARK ENDPOINTS', ()=> {
             })
         })*/
     })
-
-    describe(`Bookmark /api/bookmarks/:id`,()=>{
+    describe(`/api/bookmarks/:id`,()=>{
         beforeEach('insert bookmarks',()=>{
             return db.into('bookmarks').insert(testBookmarks)  
         })
@@ -142,7 +141,7 @@ describe('BOOKMARK ENDPOINTS', ()=> {
                 const expectdBookmark= testBookmarks.filter(b=>b.id!==validId)
                 return supertest(app).delete(`/api/bookmarks/${validId}`)
                 .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-                .expect(204)
+                .expect(200)
                 .then(()=>{
                     supertest(app).get(`/api/bookmarks`)
                     .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
@@ -182,7 +181,7 @@ describe('BOOKMARK ENDPOINTS', ()=> {
                         ...updatedBookmark,
                         fieldToIgnore: `should not be in GET response`
                     })
-                    .expect(204)
+                    .expect(200)
                     .then(res=>supertest(app)
                         .get(`/api/bookmarks/${validId}`)
                         .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
@@ -197,7 +196,7 @@ describe('BOOKMARK ENDPOINTS', ()=> {
                         .patch(`/api/bookmarks/${validId}`)
                         .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
                         .send(updatedBookmark)
-                        .expect(204)
+                        .expect(200)
                         .then(res=>supertest(app)
                             .get(`/api/bookmarks/${validId}`)
                             .set('Authorization', `Bearer ${process.env.API_TOKEN}`)

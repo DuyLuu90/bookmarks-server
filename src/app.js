@@ -32,7 +32,6 @@ app.use(cors())
 app.use(helmet())
 
 //AUTHORIZATION
-
 app.use((req, res, next)=>{
     const userAuth= req.get('Authorization')
     if(!userAuth || userAuth.split(' ')[1] !== API_TOKEN) {

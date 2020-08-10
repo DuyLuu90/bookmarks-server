@@ -8,24 +8,19 @@ BEST PRACTICES:
 */ 
 
 const BookmarksService = {
-    // (GET /bookmarks) 
     getAllBookmarks(knex) {
         return knex('bookmarks').select('*') 
     },
-    // (GET /bookmarks/:id)
     getById(knex,id) {
         return knex('bookmarks').select('*').where({id}).first()
     },
-    // (POST /bookmarks/:id)
     insertBookmark(knex,newBookmark) {
         return knex.insert(newBookmark).into('bookmarks')
         .returning('*').then(rows=>rows[0])
     },
-    // (DELETE /bookmarks/:id)
     deleteBookmark(knex,id) {
         return knex('bookmarks').where({id}).delete()
     },
-    // (PATCH /bookmarks/:id)
     updateBookmark(knex,id,newBookmarkFields){
         return knex('bookmarks').where({id}).update(newBookmarkFields)
     }

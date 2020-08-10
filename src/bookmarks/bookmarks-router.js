@@ -1,16 +1,21 @@
 // all the related endpoints will be grouped in this file (reorganized the code)
-const path=require('path')
 const express= require('express')
+
+//SERVICE:
+const BookmarksService = require('./bookmarks-service')
+
+//TOOLS:
+const path=require('path')
 const {uuid} = require('uuidv4')
 const logger = require('../logger')
 const {isWebUri} = require('valid-url')
 const xss= require('xss')
 
 //const bookMarks = require('../store')
-const BookmarksService = require('./bookmarks-service')
+
 
 const bookmarksRouter= express.Router()
-const bodyParser= express.json() //parse the body and give us the JSON obj to work with
+const bodyParser= express.json() 
 
 const sanitizedBookmark = bookMark => ({
     id: bookMark.id,
@@ -27,16 +32,14 @@ bookmarksRouter.route('/')
         .catch(next)
 }) 
 .post(bodyParser,(req,res,next)=>{
-    const {title,url,description,rating} = req.body //object destructuring 
+    const {title,url,description,rating} = req.body  
     const  newBookMark= {title, url, description,rating}
-    //validation middleware -> header
+    /*
     for (const field of ['title','url','description','rating']) {
         if(!req.body[field]) {
             //logger.error(`${field} is required`)
             return res.status(400).send(`${field} is required`)}
     }
-    //after all validation passed
-    
     if(!Number.isInteger(rating)|| rating<0 || rating>5) {
         //logger.error(`Invalid rating`)
         return res.status(400).send(`rating must be a number between 0 and 5`)
@@ -44,13 +47,11 @@ bookmarksRouter.route('/')
     if (!isWebUri(url)) {
         //logger.error(`Invalid url`)
         return res.status(400).send(`url must be a valid url`)
-    }
-    //bookMarks.push(newBookMark)
-    //logger.info(`Bookmark with id ${newBookMark.id} created`)
+    }*/
+    
     BookmarksService.insertBookmark(req.app.get('db'),newBookMark)
     .then((bookMark)=>{
-        res.status(201)
-        .location(path.posix.join(req.originalUrl,`/${bookMark.id}`))
+        res.status(201).location(path.posix.join(req.originalUrl,`/${bookMark.id}`))
         .json(sanitizedBookmark(bookMark))
     })
     .catch(next)
@@ -75,7 +76,7 @@ bookmarksRouter.route('/:id')
 .delete((req,res,next)=>{
     const {id} = req.params;
     BookmarksService.deleteBookmark(req.app.get('db'),id)
-    .then(()=>{res.status(204).end()})
+    .then(()=>{res.status(200).json('success')})
     .catch(next)
 }) 
 .patch(bodyParser,(req,res,next)=>{
@@ -91,7 +92,7 @@ bookmarksRouter.route('/:id')
     }
     
     BookmarksService.updateBookmark(knex,req.params.id,bookMarkToUpdate)
-    .then(()=>res.status(204).end())
+    .then(()=>res.status(200).json('Success'))
     .catch(next)
 })
 

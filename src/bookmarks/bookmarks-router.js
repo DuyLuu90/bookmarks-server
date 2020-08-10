@@ -34,7 +34,7 @@ bookmarksRouter.route('/')
 .post(bodyParser,(req,res,next)=>{
     const {title,url,description,rating} = req.body  
     const  newBookMark= {title, url, description,rating}
-    /*
+    
     for (const field of ['title','url','description','rating']) {
         if(!req.body[field]) {
             //logger.error(`${field} is required`)
@@ -47,7 +47,7 @@ bookmarksRouter.route('/')
     if (!isWebUri(url)) {
         //logger.error(`Invalid url`)
         return res.status(400).send(`url must be a valid url`)
-    }*/
+    }
     
     BookmarksService.insertBookmark(req.app.get('db'),newBookMark)
     .then((bookMark)=>{
